@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BalanceServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BalanceServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BalanceServiceApplication.class, args);
+    }
 
 }

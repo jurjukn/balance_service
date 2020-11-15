@@ -16,6 +16,10 @@ public class BankAccount {
         return accountNumber;
     }
 
+    public List<BankStatement> getBankStatements() {
+        return bankStatements;
+    }
+
     public void addBankStatement(BankStatement statement) {
         bankStatements.add(statement);
     }

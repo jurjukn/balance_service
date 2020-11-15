@@ -9,7 +9,7 @@ import java.util.HashMap;
 @Repository("fakeDao")
 public class FakeBankAccountDataAccessService implements BankAccountRepository {
 
-    private static HashMap<String, BankAccount> DB = new HashMap<String, BankAccount>();
+    private static HashMap<String, BankAccount> DB = new HashMap<>();
 
     FakeBankAccountDataAccessService() {
         // This is hardcoded and should be removed before production.

@@ -7,12 +7,12 @@ import com.example.balanceservice.exception.model.UnsupportedFileTypeException;
 import com.example.balanceservice.model.BankStatement;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +34,36 @@ public class CSVHelper {
 
     public static boolean hasCSVFormat(MultipartFile file) {
         return TYPE.equals(file.getContentType());
+    }
+
+    public static InputStreamResource bankStatementsToCSV(List<BankStatement> bankStatements) {
+        final CSVFormat format = CSVFormat.DEFAULT.withQuoteMode(QuoteMode.MINIMAL);
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+             CSVPrinter csvPrinter = new CSVPrinter(new PrintWriter(out), format);) {
+
+            csvPrinter.printRecord(CSV_HEADERS);
+
+            for (BankStatement bankStatement : bankStatements) {
+                List<String> data = Arrays.asList(
+                        bankStatement.getAccountNumber(),
+                        bankStatement.getDateTime().toString(),
+                        bankStatement.getBeneficiary(),
+                        bankStatement.getComment(),
+                        bankStatement.getAmount().toString(),
+                        bankStatement.getCurrency()
+                );
+
+                csvPrinter.printRecord(data);
+            }
+
+            csvPrinter.flush();
+            final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(out.toByteArray());
+            final InputStreamResource inputStreamResource = new InputStreamResource(byteArrayInputStream);
+            return inputStreamResource;
+        } catch (IOException e) {
+            throw new RuntimeException("fail to import data to CSV file: " + e.getMessage());
+        }
     }
 
     public static List<BankStatement> csvToBankStatements(MultipartFile file) {

@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Optional;
 
 @RestController
@@ -30,6 +31,22 @@ public class BankAccountController {
         return ResponseEntity.status(HttpStatus.OK).body("Bank account successfully updated with statements");
     }
 
+    // Export bank statements for bank account.
+    @RequestMapping("api/bank_accounts/{account_number}/bank_statements/export")
+    @GetMapping
+    public ResponseEntity<Resource> exportStatements(@PathVariable("account_number") String accountNumber,
+                                                     @RequestParam("date_from") Optional<String> dateFrom,
+                                                     @RequestParam("date_to") Optional<String> dateTo) {
+
+        String fileName = "statements.csv";
+        InputStreamResource file = bankAccountService.exportBankAccountStatements(accountNumber, dateFrom, dateTo);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .contentType(MediaType.parseMediaType("application/csv"))
+                .body(file);
+    }
+
     // Import bank statement for multiple bank accounts.
     @RequestMapping("api/bank_statements/import")
     @PostMapping
@@ -38,15 +55,14 @@ public class BankAccountController {
         return ResponseEntity.status(HttpStatus.OK).body("Statements successfully imported.");
     }
 
-    // Export bank statements for bank account.
-    @RequestMapping("api/bank_accounts/{account_number}/bank_statements/export")
+    // Export bank statements.
+    @RequestMapping("api/bank_statements/export")
     @GetMapping
-    public ResponseEntity<Resource> exportStatements(@PathVariable("account_number") String accountNumber,
-                                                     @RequestParam("dateFrom") Optional<String> dateFrom,
-                                                     @RequestParam("dateTo") Optional<String> dateTo) {
+    public ResponseEntity<Resource> exportStatements(@RequestParam("date_from") Optional<String> dateFrom,
+                                                     @RequestParam("date_to") Optional<String> dateTo) {
 
         String fileName = "statements.csv";
-        InputStreamResource file = bankAccountService.exportBankAccountStatements(accountNumber, dateFrom, dateTo);
+        InputStreamResource file = bankAccountService.exportBankStatements(dateFrom, dateTo);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)

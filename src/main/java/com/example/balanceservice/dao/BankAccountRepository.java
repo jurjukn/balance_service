@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public interface BankAccountRepository {
 
-    void importBankStatement(String accountNumber, BankStatement bankStatements);
+    void importBankStatement(BankStatement bankStatements);
 
     int exportBankStatement();
 

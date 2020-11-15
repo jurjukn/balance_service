@@ -18,8 +18,8 @@ public class FakeBankAccountDataAccessService implements BankAccountRepository {
     }
 
     @Override
-    public void importBankStatement(String accountNumber, BankStatement bankStatement) {
-        DB.get(accountNumber).addBankStatement(bankStatement);
+    public void importBankStatement(BankStatement bankStatement) {
+        DB.get(bankStatement.getAccountNumber()).addBankStatement(bankStatement);
     }
 
     @Override

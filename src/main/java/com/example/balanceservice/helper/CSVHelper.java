@@ -1,6 +1,7 @@
 package com.example.balanceservice.helper;
 
 import com.example.balanceservice.exception.model.CSVParseException;
+import com.example.balanceservice.exception.model.IllegalCSVArgumentException;
 import com.example.balanceservice.exception.model.InvalidCSVHeaderException;
 import com.example.balanceservice.exception.model.UnsupportedFileTypeException;
 import com.example.balanceservice.model.BankStatement;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CSVHelper {
+    // TODO: Maybe define fields in a object which would contain isMandatory value?
     private static final List<String> CSV_HEADERS = new ArrayList<>(
             Arrays.asList(
                     "AccountNumber",
@@ -48,10 +50,18 @@ public class CSVHelper {
             }
 
             List<BankStatement> bankStatements = new ArrayList<>();
-            csvParser.forEach(csvRecord -> bankStatements.add(new BankStatement(csvRecord)));
+            csvParser.forEach(csvRecord -> {
+                final BankStatement bankStatement = new BankStatement(csvRecord);
+                if (!bankStatement.isValid()) {
+                    throw new IllegalCSVArgumentException(file.getOriginalFilename());
+                }
+                bankStatements.add(bankStatement);
+            });
             return bankStatements;
         } catch (IOException e) {
             throw new CSVParseException(file.getOriginalFilename(), e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalCSVArgumentException(file.getOriginalFilename(), e.toString());
         }
     }
 }

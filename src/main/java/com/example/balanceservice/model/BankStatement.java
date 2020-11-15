@@ -36,4 +36,10 @@ public class BankStatement {
         return accountNumber;
     }
 
+    public boolean isValid() {
+        return !this.accountNumber.isEmpty() && !this.date.isEmpty()
+                && !this.beneficiary.isEmpty() && this.amount != null
+                && !this.currency.isEmpty();
+    }
+
 }

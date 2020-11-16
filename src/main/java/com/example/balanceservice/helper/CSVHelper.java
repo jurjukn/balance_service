@@ -59,8 +59,7 @@ public class CSVHelper {
 
             csvPrinter.flush();
             final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(out.toByteArray());
-            final InputStreamResource inputStreamResource = new InputStreamResource(byteArrayInputStream);
-            return inputStreamResource;
+            return new InputStreamResource(byteArrayInputStream);
         } catch (IOException e) {
             throw new RuntimeException("fail to import data to CSV file: " + e.getMessage());
         }

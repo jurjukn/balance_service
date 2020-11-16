@@ -24,7 +24,4 @@ public class BankAccount {
         bankStatements.add(statement);
     }
 
-    public void addBankStatements(List<BankStatement> statements) {
-        bankStatements.addAll(statements);
-    }
 }

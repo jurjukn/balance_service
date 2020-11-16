@@ -15,4 +15,4 @@ For testing I suggest using Postman.
 - api/bank_accounts/{account_id}/bank_statements/import -- with parameter file of type file. Csv file can be attached
   - POST with parameter file containing csv file.
 - api/bank_statements/import
-  -POST with parameter file containing csv file.
+  - POST with parameter file containing csv file.

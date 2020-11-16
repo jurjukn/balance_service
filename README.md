@@ -20,6 +20,8 @@ For testing I suggest using Postman.
 - api/bank_statements/import
   - POST with parameter file containing csv file.
   
-# Request examples
+# Request examples and test data
+https://we.tl/t-ytV248Lok4
+Also attached with email
 
 

@@ -1,6 +1,6 @@
 # balance_service
 
-Sorry for having so few unit tests. Ran out of time.
+Sorry for having so few and poor unit tests. Ran out of time.
 
 Run:
 Open Intellij, install dependencies and run Spring Boot project.

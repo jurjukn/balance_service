@@ -44,14 +44,14 @@ public class FakeBankAccountsDataAccessService implements BankAccountsRepository
     }
 
     @Override
-    public HashMap<String, BankAccount> getBankAccounts() {
-        return DB;
+    public List<String> getBankAccountsNumbers() {
+        return new ArrayList<>(DB.keySet());
     }
 
     @Override
     public List<BankStatement> filterBankStatements(DataFilterDTO filter) {
         List<BankStatement> bankStatements = new ArrayList<>();
-        for (BankAccount value : this.getBankAccounts().values()) {
+        for (BankAccount value : DB.values()) {
             bankStatements.addAll(value.getBankStatements());
         }
 

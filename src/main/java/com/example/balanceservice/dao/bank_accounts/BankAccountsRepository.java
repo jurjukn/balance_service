@@ -4,7 +4,6 @@ import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.model.BankAccount;
 import com.example.balanceservice.model.BankStatement;
 
-import java.util.HashMap;
 import java.util.List;
 
 public interface BankAccountsRepository {
@@ -15,7 +14,7 @@ public interface BankAccountsRepository {
 
     List<BankStatement> getBankAccountStatements(String accountNumber);
 
-    HashMap<String, BankAccount> getBankAccounts();
+    List<String> getBankAccountsNumbers();
 
     List<BankStatement> filterBankAccountStatements(String accountNumber, DataFilterDTO filter);
 

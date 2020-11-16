@@ -21,7 +21,7 @@ public class BankAccountController {
         this.bankService = bankService;
     }
 
-    // Import bank statement for bank account.
+    // Get bank account balance.
     @RequestMapping("api/bank_accounts/{account_number}/balance")
     @GetMapping
     public String getBankAccountBalance(@PathVariable("account_number") String accountNumber,
@@ -41,6 +41,14 @@ public class BankAccountController {
         return ResponseEntity.status(HttpStatus.OK).body("Bank account successfully updated with statements");
     }
 
+    // Import bank statement for multiple bank accounts.
+    @RequestMapping("api/bank_statements/import")
+    @PostMapping
+    public ResponseEntity importStatements(@RequestParam("file") MultipartFile file) {
+        bankService.importStatements(file);
+        return ResponseEntity.status(HttpStatus.OK).body("Statements successfully imported.");
+    }
+
     // Export bank statements for bank account.
     @RequestMapping("api/bank_accounts/{account_number}/bank_statements/export")
     @GetMapping
@@ -54,14 +62,6 @@ public class BankAccountController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
                 .contentType(MediaType.parseMediaType("application/csv"))
                 .body(file);
-    }
-
-    // Import bank statement for multiple bank accounts.
-    @RequestMapping("api/bank_statements/import")
-    @PostMapping
-    public ResponseEntity importStatements(@RequestParam("file") MultipartFile file) {
-        bankService.importStatements(file);
-        return ResponseEntity.status(HttpStatus.OK).body("Statements successfully imported.");
     }
 
     // Export bank statements.

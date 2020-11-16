@@ -34,6 +34,6 @@ public class FakeCurrenciesDataAccessService implements CurrenciesRepository {
             throw new UnsupportedCurrencyException(sourceCurrency);
         }
 
-        return source.get().getRates().get(destinationCurrency);
+        return source.get().getExchangeRates().get(destinationCurrency);
     }
 }

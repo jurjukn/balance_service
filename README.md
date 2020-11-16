@@ -1,6 +1,11 @@
 # balance_service
 
-Sorry for having to little unit tests. Ran out of time.
+Sorry for having so few unit tests. Ran out of time.
+
+Run:
+Open Intellij, install dependencies and run Spring Boot project.
+For testing I suggest using Postman.
+
 
 # Endpoints
 - api/bank_accounts/{account_id}/balance

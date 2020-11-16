@@ -14,7 +14,7 @@ public class FakeCurrenciesDataAccessService implements CurrenciesRepository {
 
     private static List<Currency> DB = new ArrayList<>();
 
-    FakeCurrenciesDataAccessService() {
+    public FakeCurrenciesDataAccessService() {
         // This is hardcoded and should be removed before production.
         Currency usd = new Currency("USD");
         usd.setExchangeRate("EUR", new BigDecimal("0.84"));

@@ -14,6 +14,15 @@ public class BankStatement {
     private BigDecimal amount;
     private String currency;
 
+    public BankStatement(String accountNumber, LocalDateTime dateTime, String beneficiary, String comment, BigDecimal amount, String currency) {
+        this.accountNumber = accountNumber;
+        this.dateTime = dateTime;
+        this.beneficiary = beneficiary;
+        this.comment = comment;
+        this.amount = amount;
+        this.currency = currency;
+    }
+
     public BankStatement(CSVRecord csvRecord) {
         this.accountNumber = csvRecord.get("AccountNumber");
         this.dateTime = LocalDateTime.parse(csvRecord.get("Date"));

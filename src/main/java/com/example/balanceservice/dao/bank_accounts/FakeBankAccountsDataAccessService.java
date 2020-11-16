@@ -18,7 +18,7 @@ public class FakeBankAccountsDataAccessService implements BankAccountsRepository
 
     private static HashMap<String, BankAccount> DB = new HashMap<>();
 
-    FakeBankAccountsDataAccessService() {
+    public FakeBankAccountsDataAccessService() {
         // This is hardcoded and should be removed before production.
         DB.put("123", new BankAccount("123"));
         DB.put("222", new BankAccount("222"));

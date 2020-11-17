@@ -1,4 +1,4 @@
-package com.example.balanceservice.dao.bank_accounts;
+package com.example.balanceservice.repository.bank;
 
 import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.exception.model.BankAccountNotFoundException;
@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Repository("fakeBankAccountsDao")
-public class FakeBankAccountsDataAccessService implements BankAccountsRepository {
+@Repository("fakeBankRepository")
+public class FakeBankRepository implements BankRepository {
 
     private static HashMap<String, BankAccount> DB = new HashMap<>();
 
-    public FakeBankAccountsDataAccessService() {
+    public FakeBankRepository() {
         // This is hardcoded and should be removed before production.
         DB.put("123", new BankAccount("123"));
         DB.put("222", new BankAccount("222"));
@@ -57,8 +57,8 @@ public class FakeBankAccountsDataAccessService implements BankAccountsRepository
 
         return bankStatements
                 .stream()
-                .filter(statement -> isAfter(statement, filter.getDateFrom()))
-                .filter(statement -> isBefore(statement, filter.getDateTo()))
+                .filter(statement -> isStatementAfterInclusive(statement, filter.getDateFrom()))
+                .filter(statement -> isStatementBeforeInclusive(statement, filter.getDateTo()))
                 .collect(Collectors.toList());
     }
 
@@ -66,26 +66,22 @@ public class FakeBankAccountsDataAccessService implements BankAccountsRepository
     public List<BankStatement> filterBankAccountStatements(String accountNumber, DataFilterDTO filter) {
         return this.getBankAccountStatements(accountNumber)
                 .stream()
-                .filter(statement -> isAfter(statement, filter.getDateFrom()))
-                .filter(statement -> isBefore(statement, filter.getDateTo()))
+                .filter(statement -> isStatementAfterInclusive(statement, filter.getDateFrom()))
+                .filter(statement -> isStatementBeforeInclusive(statement, filter.getDateTo()))
                 .collect(Collectors.toList());
     }
 
-    private boolean isAfter(BankStatement statement, LocalDate dateFrom) {
+    private boolean isStatementAfterInclusive(BankStatement statement, LocalDate dateFrom) {
+        final LocalDate statementDate = statement.getLocalDateTime().toLocalDate();
         return Optional.ofNullable(dateFrom)
-                .map(date -> {
-                    final LocalDate statementDate = statement.getDateTime().toLocalDate();
-                    return statementDate.isAfter(dateFrom) || statement.equals(dateFrom);
-                })
-                .orElse(true);
+                .map(date -> statementDate.compareTo(dateFrom) <= 0)
+                .orElse(false);
     }
 
-    private boolean isBefore(BankStatement statement, LocalDate dateTo) {
+    private boolean isStatementBeforeInclusive(BankStatement statement, LocalDate dateTo) {
+        final LocalDate statementDate = statement.getLocalDateTime().toLocalDate();
         return Optional.ofNullable(dateTo)
-                .map(date -> {
-                    final LocalDate statementDate = statement.getDateTime().toLocalDate();
-                    return statementDate.isBefore(dateTo) || statement.equals(dateTo);
-                })
-                .orElse(true);
+                .map(date -> statementDate.compareTo(dateTo) >= 0)
+                .orElse(false);
     }
 }

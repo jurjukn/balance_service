@@ -1,7 +1,7 @@
 package com.example.balanceservice.service;
 
-import com.example.balanceservice.dao.bank_accounts.FakeBankAccountsDataAccessService;
-import com.example.balanceservice.dao.currencies.FakeCurrenciesDataAccessService;
+import com.example.balanceservice.repository.bank.FakeBankRepository;
+import com.example.balanceservice.repository.currencies.FakeCurrenciesRepository;
 import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.model.BankAccount;
 import com.example.balanceservice.model.BankStatement;
@@ -17,14 +17,15 @@ class BankServiceTest {
 
     @Test
     void calculateBalance() {
-        final FakeBankAccountsDataAccessService fakeBankAccountsDataAccessService
-                = new FakeBankAccountsDataAccessService();
-        final FakeCurrenciesDataAccessService fakeCurrenciesDataAccessService = new FakeCurrenciesDataAccessService();
-        final CurrencyService currencyService = new CurrencyService(fakeCurrenciesDataAccessService);
+        final FakeBankRepository fakeBankAccountsRepository
+                = new FakeBankRepository();
+        final FakeCurrenciesRepository fakeCurrenciesRepository = new FakeCurrenciesRepository();
+        final CurrencyService currencyService = new CurrencyService(fakeCurrenciesRepository);
         final BankStatementValidationService bankStatementValidationService = new BankStatementValidationService();
+        final CSVService csvService = new CSVService(bankStatementValidationService);
 
-        final BankService bankService = new BankService(fakeBankAccountsDataAccessService,
-                currencyService, bankStatementValidationService);
+        final BankService bankService = new BankService(fakeBankAccountsRepository,
+                currencyService, bankStatementValidationService, csvService);
 
         String bankAccountNumber = "123";
 
@@ -49,7 +50,7 @@ class BankServiceTest {
                 new BigDecimal("9.5"),
                 "EUR");
 
-        final BankAccount account1 = fakeBankAccountsDataAccessService.getBankAccount(bankAccountNumber);
+        final BankAccount account1 = fakeBankAccountsRepository.getBankAccount(bankAccountNumber);
         account1.addBankStatement(statement1);
         account1.addBankStatement(statement2);
         account1.addBankStatement(statement3);

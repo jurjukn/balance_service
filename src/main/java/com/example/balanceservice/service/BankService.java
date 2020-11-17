@@ -1,11 +1,11 @@
 package com.example.balanceservice.service;
 
-import com.example.balanceservice.dao.bank_accounts.BankAccountsRepository;
 import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.exception.model.StatementWithInvalidBankAccountException;
-import com.example.balanceservice.helper.CSVHelper;
+//import com.example.balanceservice.helper.CSVHelper;
 import com.example.balanceservice.model.BankAccount;
 import com.example.balanceservice.model.BankStatement;
+import com.example.balanceservice.repository.bank.BankRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -17,24 +17,32 @@ import java.util.List;
 
 @Service
 public class BankService {
-    private final BankAccountsRepository bankAccountsRepository;
+
+    private final BankRepository bankRepository;
     private final CurrencyService currencyService;
     private final BankStatementValidationService bankStatementValidationService;
+    private final CSVService csvService;
 
     @Autowired
     public BankService(
-            @Qualifier("fakeBankAccountsDao") BankAccountsRepository bankAccountsRepository,
+            @Qualifier("fakeBankRepository") BankRepository bankRepository,
             CurrencyService currencyService,
-            BankStatementValidationService bankStatementValidationService) {
-        this.bankAccountsRepository = bankAccountsRepository;
-        this.currencyService = currencyService;
-        this.bankStatementValidationService = bankStatementValidationService;
+            BankStatementValidationService bankStatementValidationService,
+            CSVService csvService) {
+        try {
+            this.bankRepository = bankRepository;
+            this.currencyService = currencyService;
+            this.bankStatementValidationService = bankStatementValidationService;
+            this.csvService = csvService;
+        } catch (Exception e){
+            int abd = 3;
+        }
     }
 
     public String calculateBalance(String accountNumber, String resultCurrency,
                                    DataFilterDTO dataFilterDTO) {
 
-        final List<BankStatement> statements = bankAccountsRepository
+        final List<BankStatement> statements = bankRepository
                 .filterBankAccountStatements(accountNumber, dataFilterDTO);
 
         BigDecimal balance = BigDecimal.ZERO;
@@ -55,41 +63,50 @@ public class BankService {
     }
 
     public void importBankAccountStatements(String accountNumber, MultipartFile statementsFile) {
-        final BankAccount bankAccount = bankAccountsRepository.getBankAccount(accountNumber);
-        final List<BankStatement> bankStatements = CSVHelper.csvToBankStatements(statementsFile);
+        final BankAccount bankAccount = bankRepository.getBankAccount(accountNumber);
+        final List<BankStatement> bankStatements = csvService.parseBankStatements(statementsFile);
 
         if (!bankStatementValidationService.bankStatementsMatchBankAccount(bankStatements,
                 bankAccount.getAccountNumber())) {
             throw new StatementWithInvalidBankAccountException(statementsFile.getOriginalFilename());
         }
 
-        bankStatements.forEach(bankAccountsRepository::importBankStatement);
+        bankStatements.forEach(bankRepository::importBankStatement);
+
+        int abd = 3;
     }
 
     public void importStatements(MultipartFile statementsFile) {
 
-        final List<BankStatement> bankStatements = CSVHelper.csvToBankStatements(statementsFile);
+        final List<BankStatement> bankStatements = csvService.parseBankStatements(statementsFile);
 
         if (!bankStatementValidationService.bankStatementsMatchBankAccounts(bankStatements,
-                bankAccountsRepository.getBankAccountsNumbers())) {
+                bankRepository.getBankAccountsNumbers())) {
             throw new StatementWithInvalidBankAccountException(statementsFile
                     .getOriginalFilename());
 
         }
 
-        bankStatements.forEach(bankAccountsRepository::importBankStatement);
+//        bankStatements.forEach(bankRepository::importBankStatement);
+
+
+        int abd = 3;
     }
 
     public InputStreamResource exportBankAccountStatements(String accountNumber, DataFilterDTO dataFilterDTO) {
-        List<BankStatement> bankStatements = bankAccountsRepository
+        List<BankStatement> bankStatements = bankRepository
                 .filterBankAccountStatements(accountNumber, dataFilterDTO);
 
-        return CSVHelper.bankStatementsToCSV(bankStatements);
+        return csvService.bankStatementsToCSV(bankStatements);
+
+//        return CSVHelper.bankStatementsToCSV(bankStatements);
     }
 
     public InputStreamResource exportStatements(DataFilterDTO filterDTO) {
-        List<BankStatement> bankStatements = bankAccountsRepository
+        List<BankStatement> bankStatements = bankRepository
                 .filterBankStatements(filterDTO);
-        return CSVHelper.bankStatementsToCSV(bankStatements);
+
+        return csvService.bankStatementsToCSV(bankStatements);
+//        return CSVHelper.bankStatementsToCSV(bankStatements);
     }
 }

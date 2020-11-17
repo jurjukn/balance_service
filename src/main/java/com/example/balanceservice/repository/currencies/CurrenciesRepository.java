@@ -1,4 +1,4 @@
-package com.example.balanceservice.dao.currencies;
+package com.example.balanceservice.repository.currencies;
 
 import java.math.BigDecimal;
 

@@ -21,4 +21,10 @@ public class BankStatementValidationService {
                 .allMatch(statement -> accountNumbers.contains(statement.getAccountNumber()));
     }
 
+    boolean isBankStatementValid(BankStatement statement) {
+        return !statement.getAccountNumber().isEmpty() && statement.getLocalDateTime() != null
+                && !statement.getBeneficiary().isEmpty() && statement.getAmount() != null
+                && statement.getCurrency() != null;
+    }
+
 }

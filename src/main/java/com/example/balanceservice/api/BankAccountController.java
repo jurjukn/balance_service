@@ -1,5 +1,6 @@
 package com.example.balanceservice.api;
 
+import com.example.balanceservice.dto.BalanceDTO;
 import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.service.BankService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class BankAccountController {
     // Get bank account balance.
     @RequestMapping("api/bank_accounts/{accountNumber}/balance")
     @GetMapping
-    public String getBankAccountBalance(@PathVariable("accountNumber") String accountNumber,
-                                        DataFilterDTO dataFilterDTO) {
+    public BalanceDTO getBankAccountBalance(@PathVariable("accountNumber") String accountNumber,
+                                            DataFilterDTO dataFilterDTO) {
 
         // Currency is hardcoded as no information about the currency of
         // balance is provided in the assignment.

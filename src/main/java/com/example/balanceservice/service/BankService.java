@@ -1,8 +1,8 @@
 package com.example.balanceservice.service;
 
+import com.example.balanceservice.dto.BalanceDTO;
 import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.exception.model.StatementWithInvalidBankAccountException;
-//import com.example.balanceservice.helper.CSVHelper;
 import com.example.balanceservice.model.BankAccount;
 import com.example.balanceservice.model.BankStatement;
 import com.example.balanceservice.repository.bank.BankRepository;
@@ -29,18 +29,16 @@ public class BankService {
             CurrencyService currencyService,
             BankStatementValidationService bankStatementValidationService,
             CSVService csvService) {
-        try {
-            this.bankRepository = bankRepository;
-            this.currencyService = currencyService;
-            this.bankStatementValidationService = bankStatementValidationService;
-            this.csvService = csvService;
-        } catch (Exception e){
-            int abd = 3;
-        }
+
+        this.bankRepository = bankRepository;
+        this.currencyService = currencyService;
+        this.bankStatementValidationService = bankStatementValidationService;
+        this.csvService = csvService;
+
     }
 
-    public String calculateBalance(String accountNumber, String resultCurrency,
-                                   DataFilterDTO dataFilterDTO) {
+    public BalanceDTO calculateBalance(String accountNumber, String resultCurrency,
+                                    DataFilterDTO dataFilterDTO) {
 
         final List<BankStatement> statements = bankRepository
                 .filterBankAccountStatements(accountNumber, dataFilterDTO);
@@ -59,7 +57,7 @@ public class BankService {
             balance = balance.add(amount);
         }
 
-        return balance.toString() + " " + resultCurrency;
+        return new BalanceDTO(balance, resultCurrency);
     }
 
     public void importBankAccountStatements(String accountNumber, MultipartFile statementsFile) {
@@ -72,8 +70,6 @@ public class BankService {
         }
 
         bankStatements.forEach(bankRepository::importBankStatement);
-
-        int abd = 3;
     }
 
     public void importStatements(MultipartFile statementsFile) {
@@ -87,10 +83,7 @@ public class BankService {
 
         }
 
-//        bankStatements.forEach(bankRepository::importBankStatement);
-
-
-        int abd = 3;
+        bankStatements.forEach(bankRepository::importBankStatement);
     }
 
     public InputStreamResource exportBankAccountStatements(String accountNumber, DataFilterDTO dataFilterDTO) {
@@ -98,8 +91,6 @@ public class BankService {
                 .filterBankAccountStatements(accountNumber, dataFilterDTO);
 
         return csvService.bankStatementsToCSV(bankStatements);
-
-//        return CSVHelper.bankStatementsToCSV(bankStatements);
     }
 
     public InputStreamResource exportStatements(DataFilterDTO filterDTO) {
@@ -107,6 +98,5 @@ public class BankService {
                 .filterBankStatements(filterDTO);
 
         return csvService.bankStatementsToCSV(bankStatements);
-//        return CSVHelper.bankStatementsToCSV(bankStatements);
     }
 }

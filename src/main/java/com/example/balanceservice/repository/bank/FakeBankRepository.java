@@ -57,8 +57,8 @@ public class FakeBankRepository implements BankRepository {
 
         return bankStatements
                 .stream()
-                .filter(statement -> isStatementAfterInclusive(statement, filter.getDateFrom()))
-                .filter(statement -> isStatementBeforeInclusive(statement, filter.getDateTo()))
+                .filter(statement -> isStatementAfterDateInclusive(statement, filter.getDateFrom()))
+                .filter(statement -> isStatementBeforeDateInclusive(statement, filter.getDateTo()))
                 .collect(Collectors.toList());
     }
 
@@ -66,22 +66,22 @@ public class FakeBankRepository implements BankRepository {
     public List<BankStatement> filterBankAccountStatements(String accountNumber, DataFilterDTO filter) {
         return this.getBankAccountStatements(accountNumber)
                 .stream()
-                .filter(statement -> isStatementAfterInclusive(statement, filter.getDateFrom()))
-                .filter(statement -> isStatementBeforeInclusive(statement, filter.getDateTo()))
+                .filter(statement -> isStatementAfterDateInclusive(statement, filter.getDateFrom()))
+                .filter(statement -> isStatementBeforeDateInclusive(statement, filter.getDateTo()))
                 .collect(Collectors.toList());
     }
 
-    private boolean isStatementAfterInclusive(BankStatement statement, LocalDate dateFrom) {
+    private boolean isStatementAfterDateInclusive(BankStatement statement, LocalDate dateFrom) {
         final LocalDate statementDate = statement.getLocalDateTime().toLocalDate();
         return Optional.ofNullable(dateFrom)
-                .map(date -> statementDate.compareTo(dateFrom) <= 0)
-                .orElse(false);
+                .map(date -> statementDate.compareTo(dateFrom) >= 0)
+                .orElse(true);
     }
 
-    private boolean isStatementBeforeInclusive(BankStatement statement, LocalDate dateTo) {
+    private boolean isStatementBeforeDateInclusive(BankStatement statement, LocalDate dateTo) {
         final LocalDate statementDate = statement.getLocalDateTime().toLocalDate();
         return Optional.ofNullable(dateTo)
-                .map(date -> statementDate.compareTo(dateTo) >= 0)
-                .orElse(false);
+                .map(date -> statementDate.compareTo(dateTo) <= 0)
+                .orElse(true);
     }
 }

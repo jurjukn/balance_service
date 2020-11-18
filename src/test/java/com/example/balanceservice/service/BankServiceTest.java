@@ -1,5 +1,6 @@
 package com.example.balanceservice.service;
 
+import com.example.balanceservice.dto.BalanceDTO;
 import com.example.balanceservice.repository.bank.FakeBankRepository;
 import com.example.balanceservice.repository.currencies.FakeCurrenciesRepository;
 import com.example.balanceservice.dto.DataFilterDTO;
@@ -55,8 +56,9 @@ class BankServiceTest {
         account1.addBankStatement(statement2);
         account1.addBankStatement(statement3);
         DataFilterDTO filterDTO1 = new DataFilterDTO(LocalDate.parse("2001-01-01"), null);
-        String balance = bankService.calculateBalance(bankAccountNumber, "EUR", filterDTO1);
+        BalanceDTO balance = bankService.calculateBalance(bankAccountNumber, "EUR", filterDTO1);
 
-        assertEquals("9.50 EUR", balance);
+        assertEquals("9.50", balance.getAmount().toString());
+        assertEquals("EUR", balance.getCurrency());
     }
 }

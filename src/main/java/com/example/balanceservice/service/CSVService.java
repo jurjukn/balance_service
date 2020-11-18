@@ -4,7 +4,6 @@ import com.example.balanceservice.exception.model.CSVParseException;
 import com.example.balanceservice.exception.model.IllegalCSVArgumentException;
 import com.example.balanceservice.exception.model.InvalidCSVHeaderException;
 import com.example.balanceservice.exception.model.UnsupportedFileTypeException;
-import com.example.balanceservice.helper.CSVHelper;
 import com.example.balanceservice.model.BankStatement;
 import org.apache.commons.csv.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class CSVService {
         this.bankStatementValidationService = bankStatementValidationService;
     }
 
-    public boolean hasCSVFormat(MultipartFile file) {
+    private boolean hasCSVFormat(MultipartFile file) {
         return TYPE.equals(file.getContentType());
     }
 
@@ -78,7 +77,7 @@ public class CSVService {
     }
 
     public List<BankStatement> parseBankStatements(MultipartFile file) {
-        if (!CSVHelper.hasCSVFormat(file)) {
+        if (!this.hasCSVFormat(file)) {
             throw new UnsupportedFileTypeException(file.getContentType());
         }
         try (InputStream is = file.getInputStream();

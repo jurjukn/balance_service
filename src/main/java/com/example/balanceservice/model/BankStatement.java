@@ -12,40 +12,6 @@ public class BankStatement {
     private String currency;
     private String comment;
 
-    public static class Builder {
-        final private String accountNumber;
-        private LocalDateTime localDateTime;
-        private String beneficiary;
-        private String comment;
-        private BigDecimal amount;
-        private String currency;
-
-        public Builder (String accountNumber, LocalDateTime localDateTime,
-                        String beneficiary, BigDecimal amount, String currency) {
-            this.accountNumber = accountNumber;
-            this.localDateTime = localDateTime;
-            this.beneficiary = beneficiary;
-            this.amount = amount;
-            this.currency = currency;
-        }
-
-        public Builder withComment(String comment){
-            this.comment = comment;
-            return this;
-        }
-
-        public BankStatement build (){
-            return new BankStatement(
-                    this.accountNumber,
-                    this.localDateTime,
-                    this.beneficiary,
-                    this.comment,
-                    this.amount,
-                    this.currency
-            );
-        }
-    }
-
     public BankStatement(String accountNumber,
                          LocalDateTime localDateTime,
                          String beneficiary,
@@ -82,5 +48,39 @@ public class BankStatement {
 
     public String getCurrency() {
         return currency;
+    }
+
+    public static class Builder {
+        final private String accountNumber;
+        private LocalDateTime localDateTime;
+        private String beneficiary;
+        private String comment;
+        private BigDecimal amount;
+        private String currency;
+
+        public Builder(String accountNumber, LocalDateTime localDateTime,
+                       String beneficiary, BigDecimal amount, String currency) {
+            this.accountNumber = accountNumber;
+            this.localDateTime = localDateTime;
+            this.beneficiary = beneficiary;
+            this.amount = amount;
+            this.currency = currency;
+        }
+
+        public Builder withComment(String comment) {
+            this.comment = comment;
+            return this;
+        }
+
+        public BankStatement build() {
+            return new BankStatement(
+                    this.accountNumber,
+                    this.localDateTime,
+                    this.beneficiary,
+                    this.comment,
+                    this.amount,
+                    this.currency
+            );
+        }
     }
 }

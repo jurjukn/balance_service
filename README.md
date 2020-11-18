@@ -4,8 +4,8 @@ Sorry for having so few and poor unit tests. Ran out of time.
 
 Run:
 Open Intellij, install dependencies and run Spring Boot project.
-There are hardcoded bank accounts and currencies in files "FakeCurrenciesDataAccessService.java" and "FakeBankAccountsDataAccessService.java". This was done in order to be able to do testing. There are 2 valid bank account number 123 and 222. 
-Make sure to do a POST request which would import bank statements. Otherwise other request will have nothing to return.   
+There are hardcoded currencies and bank accounts in files "FakeCurrenciesRepository.java" and "FakeBankRepository.java". This was done in order to be able to do debugging. There are 2 valid bank accounts (AccoutNumber: 123 and 222) and currencies (USD and EUR). 
+Make sure to do a POST request before doing GET requests. Otherwise GET requests will have nothing to return.   
 For testing I suggest using Postman.
 
 # Endpoints

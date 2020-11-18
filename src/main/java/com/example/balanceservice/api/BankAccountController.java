@@ -1,5 +1,6 @@
 package com.example.balanceservice.api;
 
+import com.example.balanceservice.dto.BalanceDTO;
 import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.service.BankService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,10 @@ public class BankAccountController {
     }
 
     // Get bank account balance.
-    @RequestMapping("api/bank_accounts/{account_number}/balance")
+    @RequestMapping("api/bank_accounts/{accountNumber}/balance")
     @GetMapping
-    public String getBankAccountBalance(@PathVariable("account_number") String accountNumber,
-                                        DataFilterDTO dataFilterDTO) {
+    public BalanceDTO getBankAccountBalance(@PathVariable("accountNumber") String accountNumber,
+                                            DataFilterDTO dataFilterDTO) {
 
         // Currency is hardcoded as no information about the currency of
         // balance is provided in the assignment.
@@ -33,9 +34,9 @@ public class BankAccountController {
     }
 
     // Import bank statement for bank account.
-    @RequestMapping("api/bank_accounts/{account_number}/bank_statements/import")
+    @RequestMapping("api/bank_accounts/{accountNumber}/bank_statements/import")
     @PostMapping
-    public ResponseEntity importStatement(@PathVariable("account_number") String accountNumber,
+    public ResponseEntity importStatement(@PathVariable("accountNumber") String accountNumber,
                                           @RequestParam("file") MultipartFile file) {
         bankService.importBankAccountStatements(accountNumber, file);
         return ResponseEntity.status(HttpStatus.OK).body("Bank account successfully updated with statements");
@@ -50,9 +51,9 @@ public class BankAccountController {
     }
 
     // Export bank statements for bank account.
-    @RequestMapping("api/bank_accounts/{account_number}/bank_statements/export")
+    @RequestMapping("api/bank_accounts/{accountNumber}/bank_statements/export")
     @GetMapping
-    public ResponseEntity<Resource> exportStatements(@PathVariable("account_number") String accountNumber,
+    public ResponseEntity<Resource> exportStatements(@PathVariable("accountNumber") String accountNumber,
                                                      DataFilterDTO dataFilterDTO) {
 
         String fileName = "statements.csv";

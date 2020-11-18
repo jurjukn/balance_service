@@ -8,4 +8,8 @@ public class IllegalCSVArgumentException extends RuntimeException {
     public IllegalCSVArgumentException(String filename) {
         super("File " + filename + " contains invalid format data");
     }
+
+    public IllegalCSVArgumentException() {
+        super("File contains invalid format data");
+    }
 }

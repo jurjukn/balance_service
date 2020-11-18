@@ -1,4 +1,4 @@
-package com.example.balanceservice.dao.currencies;
+package com.example.balanceservice.repository.currencies;
 
 import com.example.balanceservice.exception.model.UnsupportedCurrencyException;
 import com.example.balanceservice.model.Currency;
@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("fakeCurrenciesDao")
-public class FakeCurrenciesDataAccessService implements CurrenciesRepository {
+@Repository("fakeCurrenciesRepository")
+public class FakeCurrenciesRepository implements CurrenciesRepository {
 
     private static List<Currency> DB = new ArrayList<>();
 
-    public FakeCurrenciesDataAccessService() {
+    public FakeCurrenciesRepository() {
         // This is hardcoded and should be removed before production.
         Currency usd = new Currency("USD");
         usd.setExchangeRate("EUR", new BigDecimal("0.84"));

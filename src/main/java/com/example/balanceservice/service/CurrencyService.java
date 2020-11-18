@@ -1,6 +1,6 @@
 package com.example.balanceservice.service;
 
-import com.example.balanceservice.dao.currencies.CurrenciesRepository;
+import com.example.balanceservice.repository.currencies.CurrenciesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class CurrencyService {
     private final CurrenciesRepository currenciesRepository;
 
     @Autowired
-    public CurrencyService(@Qualifier("fakeCurrenciesDao") CurrenciesRepository currenciesRepository) {
+    public CurrencyService(@Qualifier("fakeCurrenciesRepository") CurrenciesRepository currenciesRepository) {
         this.currenciesRepository = currenciesRepository;
     }
 

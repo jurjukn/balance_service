@@ -1,25 +1,29 @@
-package com.example.balanceservice.helper;
+package com.example.balanceservice.service;
 
 import com.example.balanceservice.exception.model.CSVParseException;
 import com.example.balanceservice.exception.model.IllegalCSVArgumentException;
 import com.example.balanceservice.exception.model.InvalidCSVHeaderException;
 import com.example.balanceservice.exception.model.UnsupportedFileTypeException;
 import com.example.balanceservice.model.BankStatement;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.QuoteMode;
+import org.apache.commons.csv.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class CSVHelper {
+@Service
+public class CSVService {
     // TODO: Maybe define fields in a object which would contain isMandatory value?
+    // TODO: Figure out how to map headers to BankStatement object, so they could be retrieved as parameters.
     private static final List<String> CSV_HEADERS = new ArrayList<>(
             Arrays.asList(
                     "AccountNumber",
@@ -30,13 +34,20 @@ public class CSVHelper {
                     "Currency"
             )
     );
-    public static String TYPE = "text/csv";
 
-    public static boolean hasCSVFormat(MultipartFile file) {
+    public final String TYPE = "text/csv";
+    private BankStatementValidationService bankStatementValidationService;
+
+    @Autowired
+    CSVService(BankStatementValidationService bankStatementValidationService) {
+        this.bankStatementValidationService = bankStatementValidationService;
+    }
+
+    private boolean hasCSVFormat(MultipartFile file) {
         return TYPE.equals(file.getContentType());
     }
 
-    public static InputStreamResource bankStatementsToCSV(List<BankStatement> bankStatements) {
+    public InputStreamResource bankStatementsToCSV(List<BankStatement> bankStatements) {
         final CSVFormat format = CSVFormat.DEFAULT.withQuoteMode(QuoteMode.MINIMAL);
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -47,7 +58,7 @@ public class CSVHelper {
             for (BankStatement bankStatement : bankStatements) {
                 List<String> data = Arrays.asList(
                         bankStatement.getAccountNumber(),
-                        bankStatement.getDateTime().toString(),
+                        bankStatement.getLocalDateTime().toString(),
                         bankStatement.getBeneficiary(),
                         bankStatement.getComment(),
                         bankStatement.getAmount().toString(),
@@ -65,32 +76,60 @@ public class CSVHelper {
         }
     }
 
-    public static List<BankStatement> csvToBankStatements(MultipartFile file) {
-        if (!CSVHelper.hasCSVFormat(file)) {
+    public List<BankStatement> parseBankStatements(MultipartFile file) {
+        if (!this.hasCSVFormat(file)) {
             throw new UnsupportedFileTypeException(file.getContentType());
         }
         try (InputStream is = file.getInputStream();
              BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
              CSVParser csvParser = new CSVParser(fileReader,
-                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
+                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim());
         ) {
-            if (!csvParser.getHeaderNames().equals(CSVHelper.CSV_HEADERS)) {
-                throw new InvalidCSVHeaderException(file.getOriginalFilename(), CSVHelper.CSV_HEADERS.toString());
+            if (!areListsEqual(csvParser.getHeaderNames(), CSV_HEADERS)) {
+                throw new InvalidCSVHeaderException(file.getOriginalFilename(), CSV_HEADERS.toString());
             }
 
-            List<BankStatement> bankStatements = new ArrayList<>();
-            csvParser.forEach(csvRecord -> {
-                final BankStatement bankStatement = new BankStatement(csvRecord);
-                if (!bankStatement.isValid()) {
-                    throw new IllegalCSVArgumentException(file.getOriginalFilename());
-                }
-                bankStatements.add(bankStatement);
-            });
-            return bankStatements;
+            return csvParser
+                    .getRecords()
+                    .stream()
+                    .map(this::mapCSVRowToBankStatement)
+                    .collect(Collectors.toList());
+
         } catch (IOException e) {
             throw new CSVParseException(file.getOriginalFilename(), e);
         } catch (IllegalArgumentException e) {
             throw new IllegalCSVArgumentException(file.getOriginalFilename(), e.toString());
         }
     }
+
+    private boolean areListsEqual(List<String> one, List<String> two) {
+        if (one == null || two == null || one.size() != two.size()) {
+            return false;
+        }
+
+        final List<String> copyOfOne = new ArrayList<>(one);
+        final List<String> copyOfTwo = new ArrayList<>(two);
+
+        copyOfOne.sort(String::compareTo);
+        copyOfTwo.sort(String::compareTo);
+        return copyOfOne.equals(copyOfTwo);
+    }
+
+    BankStatement mapCSVRowToBankStatement(CSVRecord row) {
+        // TODO: Somehow map headers so to BankStatement object, so indexes are not hardcoded..
+        BankStatement bankStatement = new BankStatement.Builder(
+                row.get(CSV_HEADERS.get(0)),
+                LocalDateTime.parse(row.get(CSV_HEADERS.get(1))),
+                row.get(CSV_HEADERS.get(2)),
+                new BigDecimal(row.get(CSV_HEADERS.get(4))),
+                row.get(CSV_HEADERS.get(5))
+        ).withComment(CSV_HEADERS.get(3))
+                .build();
+
+        if (!bankStatementValidationService.isBankStatementValid(bankStatement)) {
+            throw new IllegalCSVArgumentException();
+        }
+        return bankStatement;
+    }
+
 }

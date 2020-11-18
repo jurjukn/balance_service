@@ -1,7 +1,5 @@
 # balance_service
 
-Sorry for having so few and poor unit tests. Ran out of time.
-
 Run:
 Open Intellij, install dependencies and run Spring Boot project.
 There are hardcoded currencies and bank accounts in files "FakeCurrenciesRepository.java" and "FakeBankRepository.java". This was done in order to be able to do debugging. There are 2 valid bank accounts (AccoutNumber: 123 and 222) and currencies (USD and EUR). 

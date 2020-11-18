@@ -3,6 +3,7 @@ package com.example.balanceservice.repository.bank;
 import com.example.balanceservice.dto.DataFilterDTO;
 import com.example.balanceservice.model.BankAccount;
 import com.example.balanceservice.model.BankStatement;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -13,13 +14,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FakeBankRepositoryTest {
-    @Test
-    void filterBankStatements() {
-        final FakeBankRepository fakeBankAccountsRepository
-                = new FakeBankRepository();
 
-        String bankAccountNumber1 = "123";
-        String bankAccountNumber2 = "222";
+    static FakeBankRepository fakeBankAccountsRepository;
+    static String bankAccountNumber1;
+    static String bankAccountNumber2;
+
+    @BeforeAll
+    public static void setup() {
+        fakeBankAccountsRepository = new FakeBankRepository();
+        bankAccountNumber1 = "123";
+        bankAccountNumber2 = "222";
 
         BankStatement statement1 = new BankStatement(bankAccountNumber1,
                 LocalDateTime.parse("2012-07-14T17:45:55.9483536"),
@@ -73,7 +77,10 @@ class FakeBankRepositoryTest {
         account2.addBankStatement(statement4);
         account2.addBankStatement(statement5);
         account2.addBankStatement(statement6);
+    }
 
+    @Test
+    void filterBankStatements() {
         DataFilterDTO filterDTO = new DataFilterDTO(LocalDate.parse("2014-01-01"), null);
         final List<BankStatement> filteredStatementList = fakeBankAccountsRepository
                 .filterBankStatements(filterDTO);
@@ -82,37 +89,9 @@ class FakeBankRepositoryTest {
 
     @Test
     void filterBankAccountStatements() {
-        final FakeBankRepository fakeBankAccountsRepository = new FakeBankRepository();
-        String bankAccountNumber = "123";
-        BankStatement statement1 = new BankStatement(bankAccountNumber,
-                LocalDateTime.parse("2012-07-14T17:45:55.9483536"),
-                "John Smith",
-                "bill",
-                new BigDecimal("13.5"),
-                "USD");
-
-        BankStatement statement2 = new BankStatement(bankAccountNumber,
-                LocalDateTime.parse("2014-07-14T17:45:55.9483536"),
-                "Jack Samuel",
-                "debt",
-                new BigDecimal("-13.5"),
-                "USD");
-
-        BankStatement statement3 = new BankStatement(bankAccountNumber,
-                LocalDateTime.parse("2018-07-14T17:45:55.9483536"),
-                "Megan Smith",
-                "transaction",
-                new BigDecimal("9.5"),
-                "USD");
-
-        final BankAccount account = fakeBankAccountsRepository.getBankAccount(bankAccountNumber);
-        account.addBankStatement(statement1);
-        account.addBankStatement(statement2);
-        account.addBankStatement(statement3);
-
         DataFilterDTO filterDTO = new DataFilterDTO(null, LocalDate.parse("2017-01-01"));
         final List<BankStatement> filteredStatementList = fakeBankAccountsRepository
-                .filterBankAccountStatements(bankAccountNumber, filterDTO);
+                .filterBankAccountStatements(bankAccountNumber1, filterDTO);
         assertEquals(2, filteredStatementList.size());
     }
 }

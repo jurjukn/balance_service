@@ -9,8 +9,8 @@ Make sure to do a POST request which would import bank statements. Otherwise oth
 For testing I suggest using Postman.
 
 # Endpoints
-- api/bank_accounts/{account_id}/balance
-	- GET
+- api/bank_accounts/{account_id}/balance?dateFrom=2015-01-01&dateTo=2018-01-15 
+	- GET -- get balance. "dateFrom" and "dateTo" are optional
 - api/bank_accounts/{account_id}/bank_statements/export?dateFrom=2015-01-01&dateTo=2018-01-15 
 	- GET -- exports to csv file. "dateFrom" and "dateTo" are optional
 - api/bank_statements/export?dateFrom=2016-01-01&dateTo=2018-06-01

@@ -1,3 +1,27 @@
+# Assignment
+You have to build a service which sole purpose is to manage bank account balance via Rest API.
+
+Create endpoints to:
+- Import bank statement for one or several bank accounts via CSV.
+- Export bank statement for one or several bank accounts via CSV.
+- Calculate account balance for given date.
+
+Notes:
+- Information imported/exported via CSV:
+	- Account number, mandatory
+	- Operation date/time, mandatory
+	- Beneficiary, mandatory
+	- Comment, optional
+	- Amount, mandatory
+	- Currency, mandatory
+- When exporting CSV, accept:
+	- date from, optional
+	- date to, optional
+- When calculating account balance accept:
+	- account number, mandatory
+	- date from, optional
+	- date to, optional
+
 # balance_service
 
 Run:
@@ -7,19 +31,31 @@ Make sure to do a POST request before doing GET requests. Otherwise GET requests
 For testing I suggest using Postman.
 
 # Endpoints
-- api/bank_accounts/{accountNumber}/balance?dateFrom=2015-01-01&dateTo=2018-01-15 
+- api/bankAccounts/{accountNumber}/balance?dateFrom=2015-01-01&dateTo=2018-01-15 
 	- GET -- get balance. "dateFrom" and "dateTo" are optional
-- api/bank_accounts/{accountNumber}/bank_statements/export?dateFrom=2015-01-01&dateTo=2018-01-15 
+- api/bankAccounts/{accountNumber}/bank_statements/export?dateFrom=2015-01-01&dateTo=2018-01-15 
 	- GET -- exports to csv file. "dateFrom" and "dateTo" are optional
-- api/bank_statements/export?dateFrom=2016-01-01&dateTo=2018-06-01
+- api/bankStatements/export?dateFrom=2016-01-01&dateTo=2018-06-01
 	- GET -- exports to csv file. "dateFrom" and "dateTo" are optional
-- api/bank_accounts/{accountNumber}/bank_statements/import -- with parameter file of type file. Csv file can be attached
+- api/bankAccounts/{accountNumber}/bankStatements/import -- with parameter file of type file. Csv file can be attached
   - POST with parameter file containing csv file.
-- api/bank_statements/import
+- api/bankStatements/import
   - POST with parameter file containing csv file.
   
 # Request examples and test data
-https://we.tl/t-ytV248Lok4
-Also attached with email
+
+Csv file containing multiple bank accounts' transactions:
+
+AccountNumber,Date,Beneficiary,Comment,Amount,Currency
+222,2018-07-14T17:45:55.9483536,James Bond,transaction to my friend,-140.09,EUR
+123,2014-05-11T18:35:25.9483536,Home Simpson,payment for work,39.13,USD
+222,2011-05-11T18:35:25.9483536,Home Simpson,payment for work,50.56,USD
+
+Csv file with single bank account transactions:
+AccountNumber,Date,Beneficiary,Comment,Amount,Currency
+123,2018-07-14T17:45:55.9483536,James Bond,transaction to my friend,10,EUR
+123,2010-07-14T17:45:55.9483536,Will Smith,bill for car,-100.52,EUR
+123,2012-07-14T17:45:55.9483536,Home Simpson,payment for rent,-10,EUR
+
 
 

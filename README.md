@@ -45,17 +45,20 @@ For testing I suggest using Postman.
 # Request examples and test data
 
 Csv file containing multiple bank accounts' transactions:
-
+```
 AccountNumber,Date,Beneficiary,Comment,Amount,Currency
 222,2018-07-14T17:45:55.9483536,James Bond,transaction to my friend,-140.09,EUR
 123,2014-05-11T18:35:25.9483536,Home Simpson,payment for work,39.13,USD
 222,2011-05-11T18:35:25.9483536,Home Simpson,payment for work,50.56,USD
+```
 
 Csv file with single bank account transactions:
+```
 AccountNumber,Date,Beneficiary,Comment,Amount,Currency
 123,2018-07-14T17:45:55.9483536,James Bond,transaction to my friend,10,EUR
 123,2010-07-14T17:45:55.9483536,Will Smith,bill for car,-100.52,EUR
 123,2012-07-14T17:45:55.9483536,Home Simpson,payment for rent,-10,EUR
+```
 
 
 

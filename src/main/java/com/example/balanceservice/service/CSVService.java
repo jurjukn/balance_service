@@ -1,69 +1,50 @@
 package com.example.balanceservice.service;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.balanceservice.exception.model.CSVParseException;
 import com.example.balanceservice.exception.model.IllegalCSVArgumentException;
 import com.example.balanceservice.exception.model.InvalidCSVHeaderException;
 import com.example.balanceservice.exception.model.UnsupportedFileTypeException;
 import com.example.balanceservice.model.BankStatement;
-import org.apache.commons.csv.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.*;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.example.balanceservice.util.CsvUtil;
 
 @Service
 public class CSVService {
-    // TODO: Maybe define fields in a object which would contain isMandatory value?
-    // TODO: Figure out how to map headers to BankStatement object, so they could be retrieved as parameters.
-    private static final List<String> CSV_HEADERS = new ArrayList<>(
-            Arrays.asList(
-                    "AccountNumber",
-                    "Date",
-                    "Beneficiary",
-                    "Comment",
-                    "Amount",
-                    "Currency"
-            )
-    );
+    private final BankStatementValidationService bankStatementValidationService;
 
-    public final String TYPE = "text/csv";
-    private BankStatementValidationService bankStatementValidationService;
-
-    @Autowired
-    CSVService(BankStatementValidationService bankStatementValidationService) {
+    public CSVService(BankStatementValidationService bankStatementValidationService) {
         this.bankStatementValidationService = bankStatementValidationService;
     }
 
-    private boolean hasCSVFormat(MultipartFile file) {
-        return TYPE.equals(file.getContentType());
-    }
-
-    public InputStreamResource bankStatementsToCSV(List<BankStatement> bankStatements) {
+    public InputStreamResource bankStatementsToCsv(List<BankStatement> bankStatements) {
         final CSVFormat format = CSVFormat.DEFAULT.withQuoteMode(QuoteMode.MINIMAL);
 
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             CSVPrinter csvPrinter = new CSVPrinter(new PrintWriter(out), format);) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream(); CSVPrinter csvPrinter = new CSVPrinter(new PrintWriter(out), format)) {
 
-            csvPrinter.printRecord(CSV_HEADERS);
+            csvPrinter.printRecord(CsvUtil.CSV_HEADERS);
 
             for (BankStatement bankStatement : bankStatements) {
-                List<String> data = Arrays.asList(
-                        bankStatement.getAccountNumber(),
-                        bankStatement.getLocalDateTime().toString(),
-                        bankStatement.getBeneficiary(),
-                        bankStatement.getComment(),
-                        bankStatement.getAmount().toString(),
-                        bankStatement.getCurrency()
-                );
+                List<String> data = Arrays.asList(bankStatement.getAccountNumber(), bankStatement.getLocalDateTime().toString(), bankStatement.getBeneficiary(), bankStatement.getComment(),
+                        bankStatement.getAmount().toString(), bankStatement.getCurrency());
 
                 csvPrinter.printRecord(data);
             }
@@ -77,23 +58,18 @@ public class CSVService {
     }
 
     public List<BankStatement> parseBankStatements(MultipartFile file) {
-        if (!this.hasCSVFormat(file)) {
+        if (!CsvUtil.hasCsvContentType(file)) {
             throw new UnsupportedFileTypeException(file.getContentType());
         }
-        try (InputStream is = file.getInputStream();
-             BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-             CSVParser csvParser = new CSVParser(fileReader,
-                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim());
-        ) {
-            if (!areListsEqual(csvParser.getHeaderNames(), CSV_HEADERS)) {
-                throw new InvalidCSVHeaderException(file.getOriginalFilename(), CSV_HEADERS.toString());
+        try (InputStream is = file.getInputStream(); BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)); CSVParser csvParser = new CSVParser(fileReader,
+                CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim())) {
+            if (!CsvUtil.hasValidHeaders(csvParser.getHeaderNames(), CsvUtil.CSV_HEADERS)) {
+                throw new InvalidCSVHeaderException(file.getOriginalFilename(), CsvUtil.CSV_HEADERS.toString());
             }
 
-            return csvParser
-                    .getRecords()
-                    .stream()
-                    .map(this::mapCSVRowToBankStatement)
-                    .collect(Collectors.toList());
+            List<BankStatement> statements = csvParser.getRecords().stream().map(CsvUtil::mapCsvRowToBankStatement).collect(Collectors.toList());
+            statements.forEach(this::validateBankStatement);
+            return statements;
 
         } catch (IOException e) {
             throw new CSVParseException(file.getOriginalFilename(), e);
@@ -102,34 +78,10 @@ public class CSVService {
         }
     }
 
-    private boolean areListsEqual(List<String> one, List<String> two) {
-        if (one == null || two == null || one.size() != two.size()) {
-            return false;
-        }
-
-        final List<String> copyOfOne = new ArrayList<>(one);
-        final List<String> copyOfTwo = new ArrayList<>(two);
-
-        copyOfOne.sort(String::compareTo);
-        copyOfTwo.sort(String::compareTo);
-        return copyOfOne.equals(copyOfTwo);
-    }
-
-    BankStatement mapCSVRowToBankStatement(CSVRecord row) {
-        // TODO: Somehow map headers so to BankStatement object, so indexes are not hardcoded..
-        BankStatement bankStatement = new BankStatement.Builder(
-                row.get(CSV_HEADERS.get(0)),
-                LocalDateTime.parse(row.get(CSV_HEADERS.get(1))),
-                row.get(CSV_HEADERS.get(2)),
-                new BigDecimal(row.get(CSV_HEADERS.get(4))),
-                row.get(CSV_HEADERS.get(5))
-        ).withComment(CSV_HEADERS.get(3))
-                .build();
-
-        if (!bankStatementValidationService.isBankStatementValid(bankStatement)) {
+    private BankStatement validateBankStatement(BankStatement statement) {
+        if (!bankStatementValidationService.isBankStatementValid(statement)) {
             throw new IllegalCSVArgumentException();
         }
-        return bankStatement;
+        return statement;
     }
-
 }

@@ -58,7 +58,7 @@ class CSVServiceTest {
     void bankStatementsToCsv() throws IOException {
 
         List<BankStatement> bankStatements = new ArrayList<>();
-        InputStreamResource inputStreamResource1 = csvService.bankStatementsToCSV(bankStatements);
+        InputStreamResource inputStreamResource1 = csvService.bankStatementsToCsv(bankStatements);
         assertEquals(56, inputStreamResource1.contentLength());
 
     }

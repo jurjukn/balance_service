@@ -1,7 +1,6 @@
 package com.example.balanceservice.service;
 
 import com.example.balanceservice.repository.currencies.CurrenciesRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,6 @@ import java.math.RoundingMode;
 public class CurrencyService {
     private final CurrenciesRepository currenciesRepository;
 
-    @Autowired
     public CurrencyService(@Qualifier("fakeCurrenciesRepository") CurrenciesRepository currenciesRepository) {
         this.currenciesRepository = currenciesRepository;
     }

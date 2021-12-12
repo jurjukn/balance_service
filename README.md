@@ -32,15 +32,15 @@ For testing I suggest using Postman.
 
 # Endpoints
 - api/bankAccounts/{accountNumber}/balance?dateFrom=2015-01-01&dateTo=2018-01-15 
-	- GET -- get balance. "dateFrom" and "dateTo" are optional
+	- GET -- gets balance of a account. "dateFrom" and "dateTo" are optional
 - api/bankAccounts/{accountNumber}/bank_statements/export?dateFrom=2015-01-01&dateTo=2018-01-15 
-	- GET -- exports to csv file. "dateFrom" and "dateTo" are optional
+	- GET -- exports bank statements of a account to a csv file. "dateFrom" and "dateTo" are optional
 - api/bankStatements/export?dateFrom=2016-01-01&dateTo=2018-06-01
-	- GET -- exports to csv file. "dateFrom" and "dateTo" are optional
+	- GET -- exports all bank statements to csv file. "dateFrom" and "dateTo" are optional
 - api/bankAccounts/{accountNumber}/bankStatements/import -- with parameter file of type file. Csv file can be attached
-  - POST with parameter file containing csv file.
+  - POST with parameter file containing csv file. Imports statements for a bank account.
 - api/bankStatements/import
-  - POST with parameter file containing csv file.
+  - POST with parameter file containing csv file. Imports statements for multiple bank accounts.
   
 # Request examples and test data
 
